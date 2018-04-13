@@ -13,7 +13,6 @@ import Node.Express.Middleware.Static (static)
 
 appSetup :: forall e. App (console :: CONSOLE | e)
 appSetup = do
-    -- get "/" (send "Hi")
     use $ static "_site"
 
 runServer :: forall e. Eff (express :: EXPRESS, console :: CONSOLE | e) Server

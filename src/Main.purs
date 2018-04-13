@@ -13,7 +13,6 @@ import Control.Monad.Eff.Exception (EXCEPTION)
 import Node.FS (FS)
 import Limax (limax)
 
-
 main :: forall e. Eff (console :: CONSOLE, buffer :: BUFFER, express :: EXPRESS, fs :: FS, exception :: EXCEPTION | e) Unit
 main = do
     S.precompile

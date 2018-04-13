@@ -28,7 +28,6 @@ copySync lhs rhs = do
     f1 <- readFile lhs
     writeFile rhs f1
 
-
 cleardirR :: forall eff. FilePath -> Eff (fs :: FS, exception :: EXCEPTION | eff) Unit
 cleardirR p = do
     files <- readdir p
