@@ -1,20 +1,33 @@
-module Tmpl (template, blogTemplate, codeblock, linkTo) where
+module Impur.Tmpl (template, blogTemplate, codeblock, linkTo) where
 
-import Prelude
 import Data.Date
-import Data.Foldable (for_)
+import Prelude
 import Text.Smolder.HTML
 import Text.Smolder.HTML.Attributes
 import Text.Smolder.Markup
-import Data.Maybe (Maybe, fromMaybe)
-import Data.Enum (toEnum)
-import Hljs (highlight)
-import Limax (limax)
-import Katex (katex)
-import Data.Tuple.Nested (type (/\), (/\))
-import Types (PostMeta)
-import Text.Smolder.HTML as H
 
+import Impur.Conf (author)
+import Data.Formatter.DateTime
+import Data.Unit (Unit(..))
+import Control.Monad.Free (liftF)
+import Data.Enum (toEnum)
+import Data.Foldable (for_)
+import Data.Maybe (Maybe(..))
+import Data.Tuple.Nested (type (/\), (/\))
+import Impur.Hljs (highlight)
+import Impur.Katex (katex)
+import Impur.Limax (limax)
+import Text.Smolder.HTML as H
+import Impur.Types (PostMeta)
+import Data.DateTime
+import Data.List.Types
+
+
+formatDate :: Date -> String
+formatDate date =
+    let dt = DateTime date (bottom :: Time) in
+    let fmt = DayOfMonth  : Placeholder " " : MonthShort : Placeholder " " : (Cons YearFull Nil) in
+    format fmt dt
 
 template :: forall a. Markup a -> Markup a
 template partial = html ! lang "en" $ do
@@ -37,6 +50,16 @@ blogTemplate :: forall a. Markup a -> PostMeta -> Markup a
 blogTemplate f meta =
     template $ do
         h2 $ text meta.title
+        p $ do
+            text "by "
+            strong $ text $ author
+            let d = meta.published
+            case d of
+                Nothing -> do
+                    H.span $ text ""
+                Just date -> do
+                    text ", "
+                    strong $ text $ formatDate date
         f
 
 codeblock :: forall e. String -> String -> Markup e

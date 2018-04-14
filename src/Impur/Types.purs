@@ -1,4 +1,4 @@
-module Types where
+module Impur.Types where
 
 import Prelude
 import Data.Date (Date, canonicalDate)

@@ -1,4 +1,4 @@
-module Server (runServer) where
+module Impur.Server (runServer) where
 
 
 import Prelude hiding (apply)

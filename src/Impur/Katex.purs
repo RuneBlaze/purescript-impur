@@ -1,4 +1,4 @@
-module Katex (renderToString, katex) where
+module Impur.Katex (renderToString, katex) where
 
 import Prelude (($))
 import Data.Maybe (Maybe)

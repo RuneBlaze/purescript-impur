@@ -1,24 +1,24 @@
-module Index (index, posts) where
+module Impur.Index (index, posts) where
 
 import Prelude
 import Data.Date
 import Data.Foldable (for_)
-import Types (PostMeta, PostRaw, PostContents, Post, mkDate)
-import Tmpl (template, codeblock, linkTo)
+import Impur.Types (PostMeta, PostRaw, PostContents, Post, mkDate)
+import Impur.Tmpl (template, codeblock, linkTo)
 import Text.Smolder.HTML
 import Text.Smolder.HTML.Attributes
 import Text.Smolder.Markup
 import Data.Maybe (Maybe, fromMaybe)
 
-import Hljs (highlight)
-import Katex (katex)
+import Impur.Hljs (highlight)
+import Impur.Katex (katex)
 import Data.Tuple.Nested (type (/\), (/\))
 
 import Text.Smolder.HTML as H
 import Text.Smolder.HTML.Attributes as A
 import Data.Array (mapWithIndex)
 
-import Posts.ExamplePost as EP
+import Impur.Posts.ExamplePost as EP
 
 posts :: Array Post
 posts = [EP.post]

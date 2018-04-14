@@ -1,4 +1,4 @@
-module Site (static, precompile) where
+module Impur.Site (static, precompile) where
 
 import Control.Monad.Eff.Exception
 import Control.Monad.Eff.Now

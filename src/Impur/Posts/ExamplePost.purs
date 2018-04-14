@@ -1,8 +1,8 @@
-module Posts.ExamplePost (post) where
+module Impur.Posts.ExamplePost (post) where
 
 import Prelude (($))
-import Types (PostMeta, PostRaw, PostContents, Post, mkDate)
-import Tmpl (blogTemplate)
+import Impur.Types (PostMeta, PostRaw, PostContents, Post, mkDate)
+import Impur.Tmpl (blogTemplate)
 import Text.Smolder.Markup
 import Data.Date
 import Data.Tuple.Nested ((/\))
