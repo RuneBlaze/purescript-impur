@@ -31,15 +31,16 @@ formatDate date =
 
 template :: forall a. Markup a -> Markup a
 template partial = html ! lang "en" $ do
+    let heading = "Impure, a PureScript static site generator"
     H.head $ do
-        H.title $ text "Impure, a PureScript static site generator"
+        H.title $ text heading
         meta ! charset "utf-8"
         meta ! name "viewport" ! content "width=device-width, initial-scale=1"
         link ! rel "stylesheet" ! href "/hack.css"
         link ! rel "stylesheet" ! href "/highlight.min.css"
     body ! className "hack" $ do
         H.div ! className "container" $ do
-            h1 $ text "Homot, a purescript static site generator"
+            h1 $ text heading
             nav $ do
                 H.div ! className "cell -4of12" $ do
                     H.div ! className "content" $ do
