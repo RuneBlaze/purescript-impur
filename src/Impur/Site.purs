@@ -52,6 +52,7 @@ precompile = do
     let fns = P.map g files
     for_ fns \(a /\ b) -> copySync a b
     mkdir "_site/posts"
+    mkdir "_site/cats"
 
 prefixPath :: String -> String
 prefixPath s = "_site/" <> s

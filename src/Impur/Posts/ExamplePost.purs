@@ -8,9 +8,11 @@ import Data.Date
 import Data.Tuple.Nested ((/\))
 import Text.Smolder.HTML
 import Text.Smolder.HTML.Attributes
+import Impur.Conf (Category(..))
+import Data.Maybe (Maybe(..))
 
 postMeta :: PostMeta
-postMeta = {title: "Example Post", published: mkDate 2018 4 2}
+postMeta = {title: "Example Post", published: mkDate 2018 4 2, category: Just Programming}
 
 contents :: forall a. PostMeta -> Markup a
 contents = blogTemplate $ do

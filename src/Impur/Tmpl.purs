@@ -1,4 +1,4 @@
-module Impur.Tmpl (template, blogTemplate, codeblock, linkTo) where
+module Impur.Tmpl (template, blogTemplate, codeblock, linkTo, categoryLink) where
 
 import Data.Date
 import Prelude
@@ -6,13 +6,13 @@ import Text.Smolder.HTML
 import Text.Smolder.HTML.Attributes
 import Text.Smolder.Markup
 
-import Impur.Conf (author)
+import Impur.Conf (author, Category(..))
 import Data.Formatter.DateTime
 import Data.Unit (Unit(..))
 import Control.Monad.Free (liftF)
 import Data.Enum (toEnum)
 import Data.Foldable (for_)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Tuple.Nested (type (/\), (/\))
 import Impur.Hljs (highlight)
 import Impur.Katex (katex)
@@ -31,7 +31,7 @@ formatDate date =
 
 template :: forall a. Markup a -> Markup a
 template partial = html ! lang "en" $ do
-    let heading = "Impure, a PureScript static site generator"
+    let heading = "Impur, a PureScript static site generator"
     H.head $ do
         H.title $ text heading
         meta ! charset "utf-8"
@@ -61,10 +61,19 @@ blogTemplate f meta =
                 Just date -> do
                     text ", "
                     strong $ text $ formatDate date
-        f
+        case meta.category of
+            Nothing -> pure unit
+            Just cat -> do
+                p $ do
+                    text "This post is categorized as: "
+                    categoryLink cat
+                    text "."
 
 codeblock :: forall e. String -> String -> Markup e
 codeblock a b = pre $ code $ unsafeRawText $ highlight a b
 
+categoryLink :: forall a. Category -> Markup a
+categoryLink c = a ! href ("/cats/" <> ((show >>> limax) c)) $ text $ show c
+
 linkTo :: forall a. PostMeta -> Markup a
-linkTo m = a ! href ("/posts/" <> limax m.title) $ text m.title
+linkTo m = a ! href ("/posts/" <> limax m.title) $ text $ m.title <> (fromMaybe "" $ (formatDate >>> (\s -> " (" <> s <> ")")) <$> m.published)

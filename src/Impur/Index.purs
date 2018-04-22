@@ -1,32 +1,39 @@
-module Impur.Index (index, posts) where
+module Impur.Index (index, posts, categoryPage) where
 
-import Prelude
 import Data.Date
-import Data.Foldable (for_)
-import Impur.Types (PostMeta, PostRaw, PostContents, Post, mkDate)
-import Impur.Tmpl (template, codeblock, linkTo)
+import Prelude
 import Text.Smolder.HTML
 import Text.Smolder.HTML.Attributes
 import Text.Smolder.Markup
-import Data.Maybe (Maybe, fromMaybe)
 
+import Data.Array (mapWithIndex, filter)
+import Data.Foldable (for_)
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Tuple.Nested (type (/\), (/\))
+import Data.Unit (Unit)
+import Impur.Conf (Category(..), categories)
 import Impur.Hljs (highlight)
 import Impur.Katex (katex)
-import Data.Tuple.Nested (type (/\), (/\))
-
+import Impur.Posts.ExamplePost as EP
+import Impur.Tmpl (codeblock, linkTo, template, categoryLink)
+import Impur.Types (PostMeta, PostRaw, PostContents, Post, mkDate)
 import Text.Smolder.HTML as H
 import Text.Smolder.HTML.Attributes as A
-import Data.Array (mapWithIndex)
-
-import Impur.Posts.ExamplePost as EP
 
 posts :: Array Post
 posts = [EP.post]
 
+categoryPage :: forall e. Category -> Markup e
+categoryPage cat = template $ do
+    h2 $ text $ "Posts with Category: " <> show cat
+    for_ posts \(m /\ _) -> li $
+        if m.category == Just cat then linkTo m else pure unit
+
+
 index :: forall e. Markup e
 index = template $ do
     p $ do
-        strong $ text "Impure"
+        strong $ text "Impur"
         text " is a PureScript static site generator. "
         text "It has one niche and goal: every page or HTML template "
         text "are to be written in PureScript."
@@ -35,10 +42,15 @@ index = template $ do
     codeblock "haskell" """index :: forall e. Markup e
 index = template $ do
     p $ do
-        strong $ text "Impure"
+        strong $ text "Impur"
         text " is a PureScript static site generator. "
         text "It has one niche and goal: every page or HTML template "
         text "are to be written in PureScript." """
     h2 $ text "here are some of my recent blogposts"
     ol $ do
         for_ (mapWithIndex (/\) posts) \(i /\ (m /\ _)) -> li $ linkTo m
+    h2 $ text "Categories"
+    p $
+        for_ categories \c -> do
+            categoryLink c
+            text " "

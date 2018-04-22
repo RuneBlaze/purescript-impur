@@ -6,10 +6,12 @@ import Data.Maybe (Maybe)
 import Text.Smolder.Markup (Markup)
 import Data.Tuple.Nested (type (/\))
 import Data.Enum (toEnum)
+import Impur.Conf (Category)
 
 type PostMeta = {
     title :: String,
-    published :: Maybe Date
+    published :: Maybe Date,
+    category :: Maybe Category
 }
 
 type PostRaw = forall e. Markup e
