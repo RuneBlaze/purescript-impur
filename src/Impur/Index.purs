@@ -16,7 +16,7 @@ import Impur.Conf (Category(..), categories)
 import Impur.Hljs (highlight)
 import Impur.Katex (katex)
 import Impur.Posts.ExamplePost as EP
-import Impur.Tmpl (codeblock, linkTo, template, categoryLink, math, mathblock)
+import Impur.Tmpl (codeblock, linkTo, template, categoryLink, math, mathblock, faIcon)
 import Impur.Types (PostMeta, Post,  mkDate)
 import Text.Smolder.HTML as H
 import Text.Smolder.HTML.Attributes as A
@@ -39,6 +39,7 @@ categoryPage cat = template $ do
 
 index :: forall e. Markup e
 index = template $ do
+    p $ faIcon "home"
     H.div $ p $ do
         mathblock "\\sqrt[3]{x}"
     p $ do
