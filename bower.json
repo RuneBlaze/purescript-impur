@@ -24,6 +24,10 @@
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"
   },
+  "repository": {
+      "type": "git",
+      "url": "git://github.com/RuneBlaze/purescript-impur.git"
+  },
   "version": "0.0.1",
   "description": "niche static site generator in purescript",
   "main": "index.js",
