@@ -4,10 +4,10 @@ import Prelude (($))
 import Data.Maybe (Maybe)
 import Data.Nullable (Nullable, toMaybe)
 
-foreign import renderToStringNullable :: String -> Nullable String
+foreign import renderToStringNullable :: String -> Boolean -> Nullable String
 
-renderToString :: String -> Maybe String
-renderToString s = toMaybe $ renderToStringNullable s
+renderToString :: String -> Boolean -> Maybe String
+renderToString s b = toMaybe $ renderToStringNullable s b
 
-katex :: String -> Maybe String
+katex :: String -> Boolean -> Maybe String
 katex = renderToString

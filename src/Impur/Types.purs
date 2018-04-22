@@ -1,10 +1,10 @@
-module Impur.Types where
+module Impur.Types (PostMeta, Post, mkDate, PostRaw, PostContents) where
 
 import Prelude
 import Data.Date (Date, canonicalDate)
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe(..))
 import Text.Smolder.Markup (Markup)
-import Data.Tuple.Nested (type (/\))
+import Data.Tuple.Nested (type (/\), (/\))
 import Data.Enum (toEnum)
 import Impur.Conf (Category)
 

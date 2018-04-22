@@ -37,6 +37,17 @@ cleardirR p = do
         if isDirectory st then cleardirR pt else unlink pt
     rmdir p
 
+copySyncR :: forall eff. FilePath -> FilePath -> Eff (buffer :: BUFFER, fs :: FS, exception :: EXCEPTION | eff) Unit
+copySyncR lhs rhs = do
+    files <- readdir lhs
+    for_ files \n -> do
+        st <- stat (lhs <> "/" <> n)
+        if isDirectory st
+            then do
+                mkdir (rhs <> "/" <> n)
+                copySyncR (lhs <> "/" <> n) (rhs <> "/" <> n)
+            else copySync (lhs <> "/" <> n) (rhs <> "/" <> n)
+
 rmdirF :: forall eff. FilePath -> Eff (fs :: FS, exception :: EXCEPTION | eff) Unit
 rmdirF p = do
     cleardirR p
@@ -48,9 +59,10 @@ precompile = do
     when s (rmdirF "_site")
     when (not s) $ mkdir "_site"
     files <- readdir "static"
-    let g st = ("static/" <> st) /\ ("_site/" <> st)
-    let fns = P.map g files
-    for_ fns \(a /\ b) -> copySync a b
+    -- let g st = ("static/" <> st) /\ ("_site/" <> st)
+    -- let fns = P.map g files
+    -- for_ fns \(a /\ b) -> copySync a b
+    copySyncR "static" "_site"
     mkdir "_site/posts"
     mkdir "_site/cats"
 

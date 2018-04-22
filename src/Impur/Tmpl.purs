@@ -1,4 +1,4 @@
-module Impur.Tmpl (template, blogTemplate, codeblock, linkTo, categoryLink) where
+module Impur.Tmpl (template, blogTemplate, codeblock, linkTo, categoryLink, math, mathblock) where
 
 import Data.Date
 import Prelude
@@ -38,6 +38,8 @@ template partial = html ! lang "en" $ do
         meta ! name "viewport" ! content "width=device-width, initial-scale=1"
         link ! rel "stylesheet" ! href "/hack.css"
         link ! rel "stylesheet" ! href "/highlight.min.css"
+        link ! rel "stylesheet" ! href "/katex.min.css"
+        link ! rel "stylesheet" ! href "/custom.css"
     body ! className "hack" $ do
         H.div ! className "container" $ do
             h1 $ text heading
@@ -57,7 +59,7 @@ blogTemplate f meta =
             let d = meta.published
             case d of
                 Nothing -> do
-                    H.span $ text ""
+                    pure unit
                 Just date -> do
                     text ", "
                     strong $ text $ formatDate date
@@ -66,14 +68,27 @@ blogTemplate f meta =
             Just cat -> do
                 p $ do
                     text "This post is categorized as: "
-                    categoryLink cat
+                    categoryLink cat Nothing
                     text "."
 
 codeblock :: forall e. String -> String -> Markup e
 codeblock a b = pre $ code $ unsafeRawText $ highlight a b
 
-categoryLink :: forall a. Category -> Markup a
-categoryLink c = a ! href ("/cats/" <> ((show >>> limax) c)) $ text $ show c
+katexblock :: forall e. String -> Boolean -> Markup e
+katexblock s b = fromMaybe (p $ text $ "katex error: " <> s) $ unsafeRawText <$> katex s b
+
+math :: forall e. String -> Markup e
+math s = katexblock s false
+
+mathblock :: forall e. String -> Markup e
+mathblock s = katexblock s true
+
+categoryText :: Category -> Maybe Int -> String
+categoryText c (Just i) = show c <> " (" <> show i <> ")"
+categoryText c Nothing = show c
+
+categoryLink :: forall a. Category -> Maybe Int -> Markup a
+categoryLink c mb = a ! href ("/cats/" <> ((show >>> limax) c)) $ text $ categoryText c mb
 
 linkTo :: forall a. PostMeta -> Markup a
 linkTo m = a ! href ("/posts/" <> limax m.title) $ text $ m.title <> (fromMaybe "" $ (formatDate >>> (\s -> " (" <> s <> ")")) <$> m.published)
