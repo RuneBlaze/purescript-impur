@@ -1,5 +1,5 @@
 {
-  "name": "homot",
+  "name": "purescript-impur",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -24,9 +24,9 @@
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"
   },
-  "version": "0.1.0",
-  "description": "static site generator in purescript",
+  "version": "0.0.1",
+  "description": "niche static site generator in purescript",
   "main": "index.js",
   "author": "RuneBlaze",
-  "license": "MIT"
+  "license": "Apache-2.0"
 }
