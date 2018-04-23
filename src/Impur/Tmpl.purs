@@ -17,9 +17,15 @@ import Impur.Hljs (highlight)
 import Impur.Katex (katex)
 import Impur.Limax (limax)
 import Text.Smolder.HTML as H
+import Text.Smolder.Markup (mapEvent)
 import Impur.Types (PostMeta)
 import Data.DateTime (Date, DateTime(..), Time)
 import Data.List.Types (List(..), (:))
+import Impur.Classes (class TagLike)
+import Unsafe.Coerce (unsafeCoerce)
+
+coerceMarkup :: forall a b. Markup a -> Markup Unit
+coerceMarkup a = mapEvent (\l -> unit) a
 
 
 formatDate :: Date -> String
@@ -28,7 +34,7 @@ formatDate date =
     let fmt = DayOfMonth  : Placeholder " " : MonthShort : Placeholder " " : (Cons YearFull Nil) in
     format fmt dt
 
-template :: forall a. Markup a -> Markup a
+template :: forall a b. Markup a -> Markup Unit
 template partial = html ! lang "en" $ do
     let heading = "Impur, a PureScript static site generator"
     H.head $ do
@@ -47,9 +53,13 @@ template partial = html ! lang "en" $ do
                 H.div ! className "cell -4of12" $ do
                     H.div ! className "content" $ do
                         p $ a ! href "/" $ text "Index"
-            partial
+            coerceMarkup $ partial
 
-blogTemplate :: forall a. Markup a -> PostMeta -> Markup a
+blogTemplate :: forall b t e. Markup b -> (TagLike t) => {
+    title :: String,
+    published :: Maybe Date,
+    category :: Maybe t | e
+} -> forall a. Markup Unit
 blogTemplate f meta =
     template $ do
         h2 $ text meta.title
@@ -82,15 +92,17 @@ math s = katexblock s false
 mathblock :: forall e. String -> Markup e
 mathblock s = katexblock s true
 
-categoryText :: Category -> Maybe Int -> String
+categoryText :: forall t. (TagLike t) => t -> Maybe Int -> String
 categoryText c (Just i) = show c <> " (" <> show i <> ")"
 categoryText c Nothing = show c
 
 faIcon :: forall e. String -> Markup e
 faIcon = unsafeRawText <<< faIconRaw
 
-categoryLink :: forall a. Category -> Maybe Int -> Markup a
+categoryLink :: forall a t. (TagLike t) => t -> Maybe Int -> Markup a
 categoryLink c mb = a ! href ("/cats/" <> ((show >>> limax) c)) $ text $ categoryText c mb
 
-linkTo :: forall a. PostMeta -> Markup a
+linkTo :: forall a e. {title :: String, published :: Maybe Date | e} -> Markup a
 linkTo m = a ! href ("/posts/" <> limax m.title) $ text $ m.title <> (fromMaybe "" $ (formatDate >>> (\s -> " (" <> s <> ")")) <$> m.published)
+
+

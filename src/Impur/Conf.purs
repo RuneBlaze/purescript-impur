@@ -1,6 +1,7 @@
 module Impur.Conf (author, Category(..), categories) where
 
 import Prelude
+import Impur.Classes (class TagLike)
 
 author :: String
 author = "Gilgamesh"
@@ -15,3 +16,4 @@ instance showCategory :: Show Category where
     show Music = "Music"
 
 derive instance eqCategory :: Eq Category
+instance tagLikeCategory :: TagLike Category

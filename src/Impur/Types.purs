@@ -6,12 +6,13 @@ import Data.Maybe (Maybe(..))
 import Text.Smolder.Markup (Markup)
 import Data.Tuple.Nested (type (/\), (/\))
 import Data.Enum (toEnum)
-import Impur.Conf (Category)
+import Impur.Conf (Category(..))
+import Impur.Classes (class TagLike)
 
-type PostMeta = {
+type PostMeta = forall a. (TagLike a) => {
     title :: String,
     published :: Maybe Date,
-    category :: Maybe Category
+    category :: Maybe a
 }
 
 type PostRaw = forall e. Markup e

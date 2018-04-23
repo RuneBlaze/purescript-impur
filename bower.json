@@ -19,14 +19,15 @@
     "purescript-nullable": "^3.0.0",
     "purescript-prelude": "^3.1.1",
     "purescript-smolder": "https://github.com/RuneBlaze/purescript-smolder.git#^10.2.0",
-    "purescript-st": "^3.0.0"
+    "purescript-st": "^3.0.0",
+    "purescript-unsafe-coerce": "^3.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"
   },
   "repository": {
-      "type": "git",
-      "url": "git://github.com/RuneBlaze/purescript-impur.git"
+    "type": "git",
+    "url": "git://github.com/RuneBlaze/purescript-impur.git"
   },
   "version": "0.0.1",
   "description": "niche static site generator in purescript",

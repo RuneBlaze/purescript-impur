@@ -20,25 +20,35 @@ import Impur.Tmpl (codeblock, linkTo, template, categoryLink, math, mathblock, f
 import Impur.Types (PostMeta, Post,  mkDate)
 import Text.Smolder.HTML as H
 import Text.Smolder.HTML.Attributes as A
+import Impur.Classes (class TagLike)
 
-posts :: Array Post
+type GMeta e = forall e. (TagLike e) => {category :: Maybe e, published :: Maybe Date, title :: String}
+
+type GPost t m = forall t m. (TagLike t) => (GMeta t) /\ ((GMeta t) -> Markup m)
+
+showMeta :: forall t e . (TagLike t) => {category :: Maybe t | e} -> Maybe String
+showMeta m = case m.category of
+    Just n -> pure $ show n
+    Nothing -> Nothing
+
+posts :: Array ({category :: Maybe Category, published :: Maybe Date, title :: String} /\ ({category :: Maybe Category, published :: Maybe Date, title :: String } -> forall e. Markup e))
 posts = [EP.post]
 
-categoryCount :: Category -> Int
-categoryCount cat = pureST do
+categoryCount :: forall t r. (TagLike t) => t -> Array (forall l. {category :: Maybe t | r} /\ ((GMeta t) -> Markup l)) -> Int
+categoryCount cat psts = pureST do
     cnt <- newSTRef 0
-    for_ posts $ \(m /\ _) ->
-        modifySTRef cnt (\x -> x + if m.category == Just cat then 1 else 0)
+    for_ psts $ \(m /\ _) ->
+        modifySTRef cnt (\x -> x + if show <$> m.category == show <$> Just cat then 1 else 0)
     readSTRef cnt
 
-categoryPage :: forall e. Category -> Markup e
-categoryPage cat = template $ do
+categoryPage :: forall t r. (TagLike t) => t -> Array ({category :: Maybe t, published :: Maybe Date, title :: String | r} /\ ({category :: Maybe t, published :: Maybe Date, title :: String } -> forall a. Markup a)) -> forall e. Markup e
+categoryPage cat psts = template $ do
     h2 $ text $ "Posts with Category: " <> show cat
-    ol $ for_ posts \(m /\ _) -> li $
-            if m.category == Just cat then linkTo m else pure unit
+    ol $ for_ psts \(m /\ _) -> li $
+            if (show <$> (m.category :: Maybe t)) == (show <$> Just cat) then linkTo m else pure unit
 
-index :: forall e. Markup e
-index = template $ do
+index :: forall t r a. (TagLike t) => Array ({category :: Maybe t | r} /\ a) -> forall e. Markup e
+index psts = template $ do
     p $ faIcon "home"
     H.div $ p $ do
         mathblock "\\sqrt[3]{x}"
@@ -62,5 +72,5 @@ index = template $ do
     h2 $ text "Categories"
     p $
         for_ categories \c -> do
-            categoryLink c $ Just (categoryCount c)
+            -- categoryLink c $ Just (categoryCount c psts)
             text " "

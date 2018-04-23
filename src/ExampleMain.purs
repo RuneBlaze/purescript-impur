@@ -13,11 +13,12 @@ import Node.FS (FS)
 import Impur.Limax (limax)
 import Impur.Conf (categories)
 
+
 main :: forall e. Eff (console :: CONSOLE, buffer :: BUFFER, fs :: FS, exception :: EXCEPTION | e) Unit
 main = do
     S.precompile
-    S.static "index" I.index
+    S.static "index" $ I.index I.posts
     for_ I.posts \(meta /\ contents) -> let markup = contents meta in
         S.static ("posts/" <> limax meta.title) markup
     for_ categories \cat -> let name = limax $ show cat in
-        S.static ("cats/" <> name) $ I.categoryPage cat
+        S.static ("cats/" <> name) $ I.categoryPage cat I.posts
