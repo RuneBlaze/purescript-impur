@@ -33,9 +33,10 @@ mkDate y m d = do
     d' <- toEnum d
     pure $ canonicalDate y' m' d'
 
-categoryCount :: forall t r. (TagLike t) => t -> Array (forall l. {category :: Maybe t | r} /\ ((GMeta t) -> Markup l)) -> Int
+categoryCount :: forall t r a t2. (TagLike t) => (TagLike t2) => t -> Array ({category :: Maybe t2 | r} /\ a) -> Int
 categoryCount cat psts = pureST do
     cnt <- newSTRef 0
     for_ psts $ \(m /\ _) ->
         modifySTRef cnt (\x -> x + if show <$> m.category == show <$> Just cat then 1 else 0)
     readSTRef cnt
+

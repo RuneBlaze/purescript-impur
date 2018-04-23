@@ -35,7 +35,7 @@ categoryPage cat psts = template $ do
     ol $ for_ psts \(m /\ _) -> li $
             if (show <$> (m.category :: Maybe t)) == (show <$> Just cat) then linkTo m else pure unit
 
-index :: forall t r a. (TagLike t) => Array ({category :: Maybe t | r} /\ a) -> forall e. Markup e
+index :: forall t r a e. (TagLike t) => Array ({category :: Maybe t | r} /\ a) -> Markup e
 index psts = template $ do
     p $ faIcon "home"
     H.div $ p $ do
@@ -60,5 +60,5 @@ index = template $ do
     h2 $ text "Categories"
     p $
         for_ categories \c -> do
-            -- categoryLink c $ Just (categoryCount c psts)
+            categoryLink c $ Just (categoryCount c psts)
             text " "
