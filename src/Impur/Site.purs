@@ -45,12 +45,13 @@ copySyncR lhs rhs = do
     files <- readdir lhs
     for_ files \n -> do
         let p = (lhs <> "/" <> n)
+        let r = (rhs <> "/" <> n)
         st <- stat p
         if isDirectory st
             then do
-                unlessM (exists p) $ mkdir (rhs <> "/" <> n)
+                unlessM (exists r) $ mkdir (rhs <> "/" <> n)
                 copySyncR (lhs <> "/" <> n) (rhs <> "/" <> n)
-            else unlessM (exists p) $ copySync (lhs <> "/" <> n) (rhs <> "/" <> n)
+            else unlessM (exists r) $ copySync (lhs <> "/" <> n) (rhs <> "/" <> n)
 
 rmdirF :: forall eff. FilePath -> Eff (fs :: FS, exception :: EXCEPTION | eff) Unit
 rmdirF p = do
