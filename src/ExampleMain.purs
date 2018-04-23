@@ -3,7 +3,7 @@ module ExampleMain where
 import Prelude
 import Control.Monad.Eff (Eff)
 import Data.Foldable (for_)
-import Control.Monad.Eff.Console (CONSOLE)
+import Control.Monad.Eff.Console (CONSOLE, log)
 import Data.Tuple.Nested (type (/\), (/\))
 import Impur.Index (index, posts, categoryPage) as I
 import Impur.Site (static, precompile) as S

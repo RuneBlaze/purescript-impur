@@ -1,13 +1,12 @@
 module Impur.Index (index, posts, categoryPage) where
 
-import Control.Monad.ST
+
 import Data.Date
 import Prelude
 import Text.Smolder.HTML
 import Text.Smolder.HTML.Attributes
 import Text.Smolder.Markup
-
-import Data.Array (mapWithIndex, filter, sortBy)
+import Data.Array (mapWithIndex)
 import Data.Foldable (for_)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Tuple.Nested (type (/\), (/\))
@@ -17,14 +16,10 @@ import Impur.Hljs (highlight)
 import Impur.Katex (katex)
 import Impur.Posts.ExamplePost as EP
 import Impur.Tmpl (codeblock, linkTo, template, categoryLink, math, mathblock, faIcon)
-import Impur.Types (PostMeta, Post,  mkDate)
+import Impur.Types (PostMeta, Post,  mkDate, GMeta, GPost, categoryCount)
 import Text.Smolder.HTML as H
 import Text.Smolder.HTML.Attributes as A
 import Impur.Classes (class TagLike)
-
-type GMeta e = forall e. (TagLike e) => {category :: Maybe e, published :: Maybe Date, title :: String}
-
-type GPost t m = forall t m. (TagLike t) => (GMeta t) /\ ((GMeta t) -> Markup m)
 
 showMeta :: forall t e . (TagLike t) => {category :: Maybe t | e} -> Maybe String
 showMeta m = case m.category of
@@ -34,14 +29,7 @@ showMeta m = case m.category of
 posts :: Array ({category :: Maybe Category, published :: Maybe Date, title :: String} /\ ({category :: Maybe Category, published :: Maybe Date, title :: String } -> forall e. Markup e))
 posts = [EP.post]
 
-categoryCount :: forall t r. (TagLike t) => t -> Array (forall l. {category :: Maybe t | r} /\ ((GMeta t) -> Markup l)) -> Int
-categoryCount cat psts = pureST do
-    cnt <- newSTRef 0
-    for_ psts $ \(m /\ _) ->
-        modifySTRef cnt (\x -> x + if show <$> m.category == show <$> Just cat then 1 else 0)
-    readSTRef cnt
-
-categoryPage :: forall t r. (TagLike t) => t -> Array ({category :: Maybe t, published :: Maybe Date, title :: String | r} /\ ({category :: Maybe t, published :: Maybe Date, title :: String } -> forall a. Markup a)) -> forall e. Markup e
+categoryPage :: forall t r c. (TagLike t) => t -> Array ({category :: Maybe t, published :: Maybe Date, title :: String | r} /\ c) -> forall e. Markup e
 categoryPage cat psts = template $ do
     h2 $ text $ "Posts with Category: " <> show cat
     ol $ for_ psts \(m /\ _) -> li $

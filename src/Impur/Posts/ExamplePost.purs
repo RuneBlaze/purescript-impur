@@ -20,25 +20,25 @@ postMeta :: {
 }
 postMeta = {title: "Example Post", published: mkDate 2018 4 2, category: Just Programming }
 
-contents :: forall t e. (TagLike t) => {
+contents :: forall a t e. (TagLike t) => {
     title :: String,
     published :: Maybe Date,
     category :: Maybe t | e
-} -> forall a. Markup a
+} -> Markup a
 contents = blogTemplate $ do
     p $ text "this is my first paragraph"
 
 
-post :: forall t13.                      
+post :: forall t13 e.                      
                    { title :: String           
                    , published :: Maybe Date   
                    , category :: Maybe Category
                    } /\                 
                    ({ title :: String          
                     , published :: Maybe Date  
-                    , category :: Maybe Category    
+                    , category :: Maybe Category
                     | t13                      
                     }                          
-                    -> forall e. Markup e
+                    -> Markup e
                    )
 post = postMeta /\ contents

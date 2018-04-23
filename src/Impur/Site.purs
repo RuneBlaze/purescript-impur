@@ -1,32 +1,35 @@
 module Impur.Site (static, precompile) where
 
-import Control.Monad.Eff.Exception
-import Control.Monad.Eff.Now
-import Data.Tuple.Nested
-import Node.Buffer
-import Node.Encoding
-import Node.FS
-import Node.FS.Stats
-import Node.FS.Sync
-import Node.Path
-import Prelude
-import Text.Smolder.HTML
-import Text.Smolder.HTML.Attributes
-import Text.Smolder.Markup
 
-import CSS (pt)
+import Prelude
+import Control.Monad.Eff.Exception (EXCEPTION)
+import Node.Buffer (BUFFER)
+import Node.Encoding (Encoding(..))
+import Node.FS (FS)
+import Node.FS.Stats (isDirectory)
+import Node.FS.Sync (exists, mkdir, readFile, readdir, rmdir, stat, unlink, writeFile)
+import Node.Path (FilePath)
+import Text.Smolder.HTML (Html)
 import Control.Monad.Eff (Eff)
-import Control.Plus (empty)
 import Data.Foldable (for_)
 import Node.Buffer (fromString) as B
-import Node.FS.Sync (writeFile)
-import Prelude as P
 import Text.Smolder.Renderer.String (render)
 
 copySync :: forall eff. FilePath -> FilePath -> Eff (buffer :: BUFFER, fs :: FS, exception :: EXCEPTION | eff) Unit
 copySync lhs rhs = do
     f1 <- readFile lhs
     writeFile rhs f1
+
+
+cleardirRCached :: forall eff. FilePath -> FilePath -> Eff (fs :: FS, exception :: EXCEPTION | eff) Unit
+cleardirRCached p r = do
+    files <- readdir p
+    for_ files \n -> do
+        let pt = (p <> "/" <> n)
+        let rt = (r <> "/" <> n)
+        st <- stat (p <> "/" <> n)
+        if isDirectory st then cleardirRCached pt rt else unlessM (exists rt) $ unlink pt
+    unlessM (exists r) $ rmdir p
 
 cleardirR :: forall eff. FilePath -> Eff (fs :: FS, exception :: EXCEPTION | eff) Unit
 cleardirR p = do
@@ -41,12 +44,13 @@ copySyncR :: forall eff. FilePath -> FilePath -> Eff (buffer :: BUFFER, fs :: FS
 copySyncR lhs rhs = do
     files <- readdir lhs
     for_ files \n -> do
-        st <- stat (lhs <> "/" <> n)
+        let p = (lhs <> "/" <> n)
+        st <- stat p
         if isDirectory st
             then do
-                mkdir (rhs <> "/" <> n)
+                unlessM (exists p) $ mkdir (rhs <> "/" <> n)
                 copySyncR (lhs <> "/" <> n) (rhs <> "/" <> n)
-            else copySync (lhs <> "/" <> n) (rhs <> "/" <> n)
+            else unlessM (exists p) $ copySync (lhs <> "/" <> n) (rhs <> "/" <> n)
 
 rmdirF :: forall eff. FilePath -> Eff (fs :: FS, exception :: EXCEPTION | eff) Unit
 rmdirF p = do
@@ -56,12 +60,9 @@ rmdirF p = do
 precompile :: forall eff. Eff (fs :: FS, buffer :: BUFFER, exception :: EXCEPTION | eff) Unit
 precompile = do
     s <- exists "_site"
-    when s (rmdirF "_site")
+    when s $ cleardirRCached "_site" "static"
     when (not s) $ mkdir "_site"
     files <- readdir "static"
-    -- let g st = ("static/" <> st) /\ ("_site/" <> st)
-    -- let fns = P.map g files
-    -- for_ fns \(a /\ b) -> copySync a b
     copySyncR "static" "_site"
     mkdir "_site/posts"
     mkdir "_site/cats"

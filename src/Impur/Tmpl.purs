@@ -22,11 +22,6 @@ import Impur.Types (PostMeta)
 import Data.DateTime (Date, DateTime(..), Time)
 import Data.List.Types (List(..), (:))
 import Impur.Classes (class TagLike)
-import Unsafe.Coerce (unsafeCoerce)
-
-coerceMarkup :: forall a b. Markup a -> Markup Unit
-coerceMarkup a = mapEvent (\l -> unit) a
-
 
 formatDate :: Date -> String
 formatDate date =
@@ -34,7 +29,7 @@ formatDate date =
     let fmt = DayOfMonth  : Placeholder " " : MonthShort : Placeholder " " : (Cons YearFull Nil) in
     format fmt dt
 
-template :: forall a b. Markup a -> Markup Unit
+template :: forall a. Markup a -> Markup a
 template partial = html ! lang "en" $ do
     let heading = "Impur, a PureScript static site generator"
     H.head $ do
@@ -53,13 +48,13 @@ template partial = html ! lang "en" $ do
                 H.div ! className "cell -4of12" $ do
                     H.div ! className "content" $ do
                         p $ a ! href "/" $ text "Index"
-            coerceMarkup $ partial
+            partial
 
-blogTemplate :: forall b t e. Markup b -> (TagLike t) => {
+blogTemplate :: forall a t e. Markup a -> (TagLike t) => {
     title :: String,
     published :: Maybe Date,
     category :: Maybe t | e
-} -> forall a. Markup Unit
+} -> Markup a
 blogTemplate f meta =
     template $ do
         h2 $ text meta.title
