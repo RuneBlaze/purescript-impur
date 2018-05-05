@@ -37,7 +37,7 @@ categoryPage cat psts = template $ do
 
 index :: forall t r a e. (TagLike t) => Array ({category :: Maybe t | r} /\ a) -> Markup e
 index psts = template $ do
-    p $ faIcon "home"
+    p $ faIcon "twitter"
     H.div $ p $ do
         mathblock "\\sqrt[3]{x}"
     p $ do

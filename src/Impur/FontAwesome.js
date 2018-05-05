@@ -1,9 +1,12 @@
 var fontawesome = require('@fortawesome/fontawesome');
-var solid       = require('@fortawesome/fontawesome-free-solid').default;
-fontawesome.library.add(solid);
+// var solid       = require('@fortawesome/fontawesome-free-solid').default;
+var brands      = require('@fortawesome/fontawesome-free-brands').default;
+
+// fontawesome.library.add(solid);
+fontawesome.library.add(brands);
 
 exports.faIconRaw = function(icon) {
-    return fontawesome.icon({prefix: 'fas', iconName: icon}).html;
+    return fontawesome.icon({prefix: 'fab', iconName: icon}).html;
 };
 
 exports.faCss = fontawesome.dom.css();
