@@ -3,4 +3,4 @@ Impur
 
 WIP static site generator for PureScript
 
-Do not use yet, in frequent update.
+For example output, see: https://infallible-keller-d2a893.netlify.app/
